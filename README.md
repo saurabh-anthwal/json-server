@@ -1,11 +1,13 @@
 # json-server
-Get a full fake REST API with zero coding in less than 30 seconds
+## Get a full fake REST API with zero coding in less than 30 seconds
 
 
-Install JSON Server
+`Install JSON Server`
 
-npm install -g json-server
-Create a db.json file with some data
+`npm install -g json-server`
+
+
+## Create a db.json file with some data
 
 {
   "posts": [
