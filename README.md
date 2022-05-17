@@ -9,7 +9,7 @@
 
 ## Create a db.json file with some data
 
-{
+```{
   "posts": [
     { "id": 1, "title": "json-server", "author": "typicode" }
   ],
@@ -17,13 +17,14 @@
     { "id": 1, "body": "some comment", "postId": 1 }
   ],
   "profile": { "name": "typicode" }
-}
-Start JSON Server
+}```
+**Start JSON Server**
 
-json-server --watch db.json
+`json-server --watch db.json`
+
 Now if you go to http://localhost:3000/posts/1, you'll get
 
-{ "id": 1, "title": "json-server", "author": "typicode" }
+```{ "id": 1, "title": "json-server", "author": "typicode" }```
 Also when doing requests, it's good to know that:
 
 If you make POST, PUT, PATCH or DELETE requests, changes will be automatically and safely saved to db.json using lowdb.
@@ -213,126 +214,3 @@ You can also set options in a json-server.json configuration file.
 Module
 If you need to add authentication, validation, or any behavior, you can use the project as a module in combination with other Express middlewares.
 
-Simple example
-$ npm install json-server --save-dev
-// server.js
-const jsonServer = require('json-server')
-const server = jsonServer.create()
-const router = jsonServer.router('db.json')
-const middlewares = jsonServer.defaults()
-
-server.use(middlewares)
-server.use(router)
-server.listen(3000, () => {
-  console.log('JSON Server is running')
-})
-$ node server.js
-The path you provide to the jsonServer.router function is relative to the directory from where you launch your node process. If you run the above code from another directory, it’s better to use an absolute path:
-
-const path = require('path')
-const router = jsonServer.router(path.join(__dirname, 'db.json'))
-For an in-memory database, simply pass an object to jsonServer.router().
-
-To add custom options (eg. foreginKeySuffix) pass in an object as the second argument to jsonServer.router('db.json', { foreginKeySuffix: '_id' }).
-
-Please note also that jsonServer.router() can be used in existing Express projects.
-
-Custom routes example
-Let's say you want a route that echoes query parameters and another one that set a timestamp on every resource created.
-
-const jsonServer = require('json-server')
-const server = jsonServer.create()
-const router = jsonServer.router('db.json')
-const middlewares = jsonServer.defaults()
-
-// Set default middlewares (logger, static, cors and no-cache)
-server.use(middlewares)
-
-// Add custom routes before JSON Server router
-server.get('/echo', (req, res) => {
-  res.jsonp(req.query)
-})
-
-// To handle POST, PUT and PATCH you need to use a body-parser
-// You can use the one used by JSON Server
-server.use(jsonServer.bodyParser)
-server.use((req, res, next) => {
-  if (req.method === 'POST') {
-    req.body.createdAt = Date.now()
-  }
-  // Continue to JSON Server router
-  next()
-})
-
-// Use default router
-server.use(router)
-server.listen(3000, () => {
-  console.log('JSON Server is running')
-})
-Access control example
-const jsonServer = require('json-server')
-const server = jsonServer.create()
-const router = jsonServer.router('db.json')
-const middlewares = jsonServer.defaults()
-
-server.use(middlewares)
-server.use((req, res, next) => {
- if (isAuthorized(req)) { // add your authorization logic here
-   next() // continue to JSON Server router
- } else {
-   res.sendStatus(401)
- }
-})
-server.use(router)
-server.listen(3000, () => {
-  console.log('JSON Server is running')
-})
-Custom output example
-To modify responses, overwrite router.render method:
-
-// In this example, returned resources will be wrapped in a body property
-router.render = (req, res) => {
-  res.jsonp({
-    body: res.locals.data
-  })
-}
-You can set your own status code for the response:
-
-// In this example we simulate a server side error response
-router.render = (req, res) => {
-  res.status(500).jsonp({
-    error: "error message here"
-  })
-}
-Rewriter example
-To add rewrite rules, use jsonServer.rewriter():
-
-// Add this before server.use(router)
-server.use(jsonServer.rewriter({
-  '/api/*': '/$1',
-  '/blog/:resource/:id/show': '/:resource/:id'
-}))
-Mounting JSON Server on another endpoint example
-Alternatively, you can also mount the router on /api.
-
-server.use('/api', router)
-API
-jsonServer.create()
-
-Returns an Express server.
-
-jsonServer.defaults([options])
-
-Returns middlewares used by JSON Server.
-
-options
-static path to static files
-logger enable logger middleware (default: true)
-bodyParser enable body-parser middleware (default: true)
-noCors disable CORS (default: false)
-readOnly accept only GET requests (default: false)
-jsonServer.router([path|object], [options])
-
-Returns JSON Server router.
-
-options (see CLI usage)
